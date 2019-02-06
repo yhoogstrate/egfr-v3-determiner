@@ -8,9 +8,11 @@ Estimates the number of EGFR-vIII and EGFR-wt reads in a BAM file:
 $ bin/egfr-v3-determiner -r hg38 tmp/test_001.bam
 ```
 
+Will result in a text file like this:
+
 ```
-sample	wt-reads	vIII-reads
-tmp/test_001.bam	0	1
+sample              wt-reads    vIII-reads
+tmp/test_001.bam    0           1
 ```
 
 ## Installation ##
