@@ -1,0 +1,76 @@
+#!/usr/bin/env python
+# *- coding: utf-8 -*-
+# vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 textwidth=79:
+
+"""[License: GNU General Public License v3 (GPLv3)]
+
+    EGFR vIII determiner: counts vIII / non-vIII spliced reads in BAM files
+    Copyright (C) 2019  Youri Hoogstrate
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+    You can contact me via the github repository at the following url:
+    <https://github.com/yhoogstrate/egfr-v3-determiner>
+
+    You can e-mail me via 'y.hoogstrate' at the following webmail domain:
+    gmail dot com
+"""
+
+
+import unittest
+import os
+import pysam
+
+
+def sam_to_sorted_bam(sam, sorted_bam):
+    if os.path.exists(sorted_bam):
+        print("path exists")
+        return False
+    else:
+        # for save_stdout the file needs to be touched first
+        fh = open(sorted_bam, 'wb')
+        fh.close()
+        
+        # pysam in interactive mode requires the 'save_stdout' whereas in cli mode it requires '-o'
+        pysam.sort('-o',sorted_bam, sam, save_stdout=sorted_bam)
+        
+        if os.path.getsize(sorted_bam) == 0:
+            os.remove(sorted_bam)
+            return False
+        else:
+            pysam.index(sorted_bam)
+
+        return sorted_bam
+
+
+TEST_DIR = "tests/data/"
+TMP_DIR = "tmp/"
+
+
+class Tests(unittest.TestCase):
+    def test_001(self):
+        input_file_sam = TEST_DIR + "test_001.sam"
+        input_file_bam = TMP_DIR + "test_001.bam"
+        
+        sam_to_sorted_bam(input_file_sam, input_file_bam)
+        
+        from egfrviiideterminer import egfrviiideterminer
+        dbkey = 'hg38'
+        
+        self.assertEqual(egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey]), {'vIII': 1, 'wt': 0})
+
+
+if __name__ == '__main__':
+    main()

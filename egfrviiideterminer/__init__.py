@@ -29,34 +29,17 @@
 """
 
 
-import egfrviiideterminer
-from setuptools import setup
+import logging
+import sys
 
+__version_info__ = ('0', '1', '0')
+__version__ = '.'.join(__version_info__) if (len(__version_info__) == 3) else '.'.join(__version_info__[0:3]) + "-" + __version_info__[3]
+__author__ = 'Youri Hoogstrate'
+__homepage__ = 'https://github.com/yhoogstrate/egfr-v3-determiner'
+__license__ = 'GNU General Public License v3 (GPLv3)'
+__license_notice__ = 'License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.'
 
-def get_requirements():
-    with open('requirements.txt', 'r') as fh:
-        content = fh.read().strip().split()
-    
-    return content
+__log_format__ = "[%(filename)s:%(lineno)s - %(funcName)s()] %(asctime)s - %(levelname)s - %(message)s"
+logging.basicConfig(level=logging.DEBUG, format=__log_format__, stream=sys.stderr)  # bioconda seems to crash on stdout here..
+log = logging.getLogger(__name__)
 
-
-setup(name="egfr-v3-determiner",
-      scripts=['bin/egfr-v3-determiner'],
-      packages=["egfrviiideterminer"],
-      test_suite="tests",
-      tests_require=['nose', 'pytest', 'pytest-cov'],
-      #setup_requires=['scipy', 'numpy'],
-      install_requires=[get_requirements()],
-      version=egfrviiideterminer.__version__,
-      description="Determines number of EGFR wt and vIII reads within BAM files",
-      author=egfrviiideterminer.__author__,
-      url=egfrviiideterminer.__homepage__,
-      keywords=["rna-seq", "egfr", "vIII"],
-      classifiers=[
-          'Environment :: Console',
-          'Intended Audience :: Science/Research',
-          'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
-          'Operating System :: OS Independent',
-          'Topic :: Scientific/Engineering',
-          'Topic :: Scientific/Engineering :: Bio-Informatics'
-      ])
