@@ -1,0 +1,42 @@
+#!/usr/bin/env python
+
+"""[License: GNU General Public License v3 (GPLv3)]
+
+    EGFR vIII determiner: counts vIII / non-vIII spliced reads in BAM files
+    Copyright (C) 2019  Youri Hoogstrate
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+    You can contact me via the github repository at the following url:
+    <https://github.com/yhoogstrate/egfr-v3-determiner>
+
+    You can e-mail me via 'y.hoogstrate' at the following webmail domain:
+    gmail dot com
+"""
+
+
+import click
+
+
+@click.command()
+@click.option("--reference-build", "-r",  type=click.Choice(['hg19', 'hg38']), help="Used reference genome (needed for EGFR exon coordinates)")
+@click.argument('rna_seq_alignment_files', type=click.Path(exists=True))
+def main():
+    click.echo('Hello World!')
+
+if __name__ == '__main__':
+    main()
+
+
