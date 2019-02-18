@@ -1,3 +1,6 @@
+2019-02-18  Youri Hoogstrate (v0.3.0)
+    * Exclude corner-case ambiguous reads (and become more backwards compatible with v0.1.0).
+
 2019-02-18  Youri Hoogstrate (v0.2.0)
     * Much more efficient way of determining vIII, huge performance improvements.
 
