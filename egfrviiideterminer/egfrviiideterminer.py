@@ -28,7 +28,7 @@
     gmail dot com
 """
 
-
+import sys
 import pysam
 
 """
@@ -98,76 +98,22 @@ egfr_exons = {
 
 
 def extract_viii_reads(bam, exons):
+    set_2_7 = set([])
+    set_8_10 = set([])
+    readnames = {'1': set(),
+                 '2': set_2_7, '3': set_2_7, '4': set_2_7, '5': set_2_7, '6': set_2_7, '7': set_2_7,
+                 '8': set_8_10, '9': set_8_10, '10': set_8_10}
+
     fh = pysam.AlignmentFile(bam, "rb")
 
-    processed = set([])
+    for exon in exons:
+        for read in fh.fetch(exons[exon][0], exons[exon][1], exons[exon][2]):
+            if read.get_overlap(exons[exon][1], exons[exon][2]):
+                 readnames[exon].add(read.query_name)
 
-    ex_2_7 = 0
-    ex_8_10 = 0
-
-
-    i = 0
-    for read in fh.fetch(exons['1'][0], exons['1'][1], exons['1'][2]):
-        if read.query_name not in processed:
-            processed.add(read.query_name)
-            i += 1
-            o_2_7 = 0
-            o_8_10 = 0
-
-            if read.is_paired and not read.mate_is_unmapped:
-                mate = fh.mate(read)
-                if read.get_overlap(exons["1"][1], exons["1"][2]) > 0:# or mate.get_overlap(exons["1"][1], exons["1"][2]) > 0:
-
-                    for e in range(2,7+1):
-                        exon = exons[str(e)]
-                        overlap1 = read.get_overlap(exon[1], exon[2])
-                        overlap2 = mate.get_overlap(exon[1], exon[2])
-                        if overlap1 > 0 or overlap2 > 0:
-                            o_2_7 = 1
-                    
-                    for e in range(8,10+1):
-                        exon = exons[str(e)]
-                        overlap1 = read.get_overlap(exon[1], exon[2])
-                        overlap2 = mate.get_overlap(exon[1], exon[2])
-                        if overlap1 > 0 or overlap2 > 0:
-                            o_8_10 = 1
-
-                    if o_2_7 == 1 and o_8_10 == 0:
-                        ex_2_7 += 1
-                    elif o_2_7 == 0 and o_8_10 == 1:
-                        ex_8_10 += 1
-                    elif o_2_7 == 1 and o_8_10 == 1:
-                        pass
-                        #print("\n\nWeird - could be WT and V3")
-                        #print(read)
-                        #print(mate)
-                
-                else:
-                    print("read that is not actually aligned into exon1 .. ")
-            else:
-                # #@todo - SE read
-                for e in range(2,7+1):
-                    exon = exons[str(e)]
-                    overlap1 = read.get_overlap(exon[1], exon[2])
-                    if overlap1 > 0:
-                        o_2_7 = 1
-                
-                for e in range(8,10+1):
-                    exon = exons[str(e)]
-                    overlap1 = read.get_overlap(exon[1], exon[2])
-                    if overlap1 > 0:
-                        o_8_10 = 1
-
-
-                if o_2_7 == 1 and o_8_10 == 0:
-                    ex_2_7 += 1
-                elif o_2_7 == 0 and o_8_10 == 1:
-                    ex_8_10 += 1
-                elif o_2_7 == 1 and o_8_10 == 1:
-                    pass
-                    #print("\n\nWeird - could be WT and V3")
-                    #print(read)
-                    #print(mate)
-
+    total_intersection = readnames['1'].intersection(set_2_7, set_8_10)
+    if len(total_intersection) > 0:
+        for _ in total_intersection:
+            print( "Warning, read found in exon1, exon2-7 AND exon 8-10 was found: " + _, file=sys.stderr)
     
-    return {'vIII': ex_8_10, 'wt': ex_2_7}
+    return {'vIII': len(readnames['1'].intersection(set_8_10)), 'wt': len(readnames['1'].intersection(set_2_7))}
