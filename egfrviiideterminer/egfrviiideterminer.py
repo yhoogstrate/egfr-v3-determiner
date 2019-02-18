@@ -115,7 +115,7 @@ def extract_viii_reads(bam, exons):
     #if len(total_intersection) > 0:
     for _ in total_intersection:
         print( "Warning, read found aligned to exon1, one of the exons 2-7 AND one of the exons 8-10: " + _, file=sys.stderr)
-    readnames['1'].difference(total_intersection) # important step, imagine a read that is aligned to exon1, one of the exons 2-7 AND one of the exons 8-10, that needs to be excluded
+    readnames['1'] = readnames['1'].difference(total_intersection) # important step, imagine a read that is aligned to exon1, one of the exons 2-7 AND one of the exons 8-10, that needs to be excluded
     
     exon1_to_exon2_7 = readnames['1'].intersection(set_2_7)
     exon1_to_exon8_10 = readnames['1'].intersection(set_8_10)
