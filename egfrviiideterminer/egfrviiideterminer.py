@@ -97,6 +97,44 @@ egfr_exons = {
 
 
 
+def get_splice_junction_position(alignedsegment):
+    """
+    https://sourceforge.net/p/samtools/mailman/message/29373646/
+
+    M	BAM_CMATCH	0
+    I	BAM_CINS	1
+    D	BAM_CDEL	2
+    N	BAM_CREF_SKIP	3
+    S	BAM_CSOFT_CLIP	4
+    H	BAM_CHARD_CLIP	5
+    P	BAM_CPAD	6
+    =	BAM_CEQUAL	7
+    X	BAM_CDIFF	8
+    B	BAM_CBACK	9
+    """
+    out = [None, None]# start, end
+    offset = alignedsegment.reference_start
+    for cigar in alignedsegment.cigartuples:
+        s = [offset,cigar]
+        
+        # Insertion adds a gap, does not pad
+        # soft and hardclip don't add padding
+        #               M  D  =  X
+        if cigar[0] in [0, 2, 7, 8]:# Match, Insertion, padding, Read match?, mismatch
+            offset += cigar[1]
+            s.append(offset)
+        elif cigar[0] == 9:
+            offset -= cigar[1]
+        elif cigar[0] == 3: # splice junction starts
+            out[0] = offset
+            out[1] = offset + cigar[1] + 1
+
+            return out
+    
+    return out
+
+
+
 def extract_viii_reads(bam, exons):
     set_2_7 = set([])
     set_8_10 = set([])
@@ -109,7 +147,35 @@ def extract_viii_reads(bam, exons):
     for exon in exons:
         for read in fh.fetch(exons[exon][0], exons[exon][1], exons[exon][2]):
             if read.get_overlap(exons[exon][1], exons[exon][2]):
-                 readnames[exon].add(read.query_name)
+                readnames[exon].add(read.query_name)
+
+    total_intersection = readnames['1'].intersection(set_2_7, set_8_10)
+    #if len(total_intersection) > 0:
+    for _ in total_intersection:
+        print( "Warning, read found aligned to exon1, one of the exons 2-7 AND one of the exons 8-10: " + _, file=sys.stderr)
+    readnames['1'] = readnames['1'].difference(total_intersection) # important step, imagine a read that is aligned to exon1, one of the exons 2-7 AND one of the exons 8-10, that needs to be excluded
+    
+    exon1_to_exon2_7 = readnames['1'].intersection(set_2_7)
+    exon1_to_exon8_10 = readnames['1'].intersection(set_8_10)
+
+    return {'vIII': len(exon1_to_exon8_10), 'wt': len(exon1_to_exon2_7)}
+
+
+def extract_viii_reads_based_on_sjs(bam, exons):
+    set_2_7 = set([])
+    set_8_10 = set([])
+    readnames = {'1': set(),
+                 '2': set_2_7, '3': set_2_7, '4': set_2_7, '5': set_2_7, '6': set_2_7, '7': set_2_7,
+                 '8': set_8_10, '9': set_8_10, '10': set_8_10}
+
+    fh = pysam.AlignmentFile(bam, "rb")
+
+    exon = "1"
+    for read in fh.fetch(exons[exon][0], exons[exon][1], exons[exon][2]):
+        if read.get_overlap(exons[exon][1], exons[exon][2]):
+            print(get_splice_junction_position(read))
+            #readnames[exon].add(read.query_name)
+    print("")
 
     total_intersection = readnames['1'].intersection(set_2_7, set_8_10)
     #if len(total_intersection) > 0:

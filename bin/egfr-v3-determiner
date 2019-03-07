@@ -61,7 +61,7 @@ def CLI(reference_build, spliced_reads_only, input_bam):
         if not spliced_reads_only:
             stats = egfrviiideterminer.extract_viii_reads(_, egfrviiideterminer.egfr_exons[reference_build])
         else:
-            pass # to implement
+            stats = egfrviiideterminer.extract_viii_reads_based_on_sjs(_, egfrviiideterminer.egfr_exons[reference_build])
         print(_ + "\t" + str(stats['wt']) + "\t" + str(stats['vIII']))
     
     return True
