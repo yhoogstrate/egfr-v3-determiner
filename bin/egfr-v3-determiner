@@ -47,8 +47,9 @@ def main():
 
 @click.command()
 @click.option("--reference-build", "-r", required=True, type=click.Choice(['hg19', 'hg38']), help="Used reference genome (needed for EGFR exon coordinates)")
+@click.option('--spliced-reads-only', "-s", is_flag=True, help="If paired end reads with an insert size longer than 801 bases can be expected, wild-type exon-1 to exon-8 covering reads can can be expected. Enabling this flag only uses spliced reads for vIII determination.")
 @click.argument('input_bam', type=click.Path(exists=True),nargs=-1)
-def CLI(reference_build, input_bam):
+def CLI(reference_build, spliced_reads_only, input_bam):
     from egfrviiideterminer import egfrviiideterminer
 
     if reference_build not in egfrviiideterminer.egfr_exons:
@@ -57,7 +58,10 @@ def CLI(reference_build, input_bam):
     print("sample\twt-reads\tvIII-reads")
     #idx = {}
     for _ in input_bam:
-        stats = egfrviiideterminer.extract_viii_reads(_, egfrviiideterminer.egfr_exons[reference_build])
+        if not spliced_reads_only:
+            stats = egfrviiideterminer.extract_viii_reads(_, egfrviiideterminer.egfr_exons[reference_build])
+        else:
+            stats = egfrviiideterminer.extract_viii_reads_based_on_sjs(_, egfrviiideterminer.egfr_exons[reference_build])
         print(_ + "\t" + str(stats['wt']) + "\t" + str(stats['vIII']))
     
     return True
