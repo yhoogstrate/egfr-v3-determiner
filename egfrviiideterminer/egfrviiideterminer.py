@@ -162,28 +162,32 @@ def extract_viii_reads(bam, exons):
 
 
 def extract_viii_reads_based_on_sjs(bam, exons):
-    set_2_7 = set([])
-    set_8_10 = set([])
-    readnames = {'1': set(),
-                 '2': set_2_7, '3': set_2_7, '4': set_2_7, '5': set_2_7, '6': set_2_7, '7': set_2_7,
-                 '8': set_8_10, '9': set_8_10, '10': set_8_10}
+    set_2 = set()# readnames of those that splice from exon 1 to 2
+    set_8 = set()# readnames of those that splice from exon 1 to 8
+    
+    read_idx = {'wt': set_2, 'vIII': set_8}
+    for exon in ['2', '8']:
+            if int(exon) < 8:
+                read_idx[exons[exon][1]] = set_2
+            else:
+                read_idx[exons[exon][1]] = set_8
 
     fh = pysam.AlignmentFile(bam, "rb")
 
     exon = "1"
     for read in fh.fetch(exons[exon][0], exons[exon][1], exons[exon][2]):
         if read.get_overlap(exons[exon][1], exons[exon][2]):
-            print(get_splice_junction_position(read))
-            #readnames[exon].add(read.query_name)
-    print("")
+            sj = get_splice_junction_position(read)
+            if sj[0] != None:
+                if sj[0] == exons['1'][2] and sj[1] in read_idx:
+                    read_idx[sj[1]].add(read.query_name)
 
-    total_intersection = readnames['1'].intersection(set_2_7, set_8_10)
-    #if len(total_intersection) > 0:
+    #print(read_idx['vIII'])
+    #print(read_idx['wt'])
+
+    total_intersection = set_2.intersection(set_8)
+
     for _ in total_intersection:
         print( "Warning, read found aligned to exon1, one of the exons 2-7 AND one of the exons 8-10: " + _, file=sys.stderr)
-    readnames['1'] = readnames['1'].difference(total_intersection) # important step, imagine a read that is aligned to exon1, one of the exons 2-7 AND one of the exons 8-10, that needs to be excluded
     
-    exon1_to_exon2_7 = readnames['1'].intersection(set_2_7)
-    exon1_to_exon8_10 = readnames['1'].intersection(set_8_10)
-
-    return {'vIII': len(exon1_to_exon8_10), 'wt': len(exon1_to_exon2_7)}
+    return {'vIII': len(read_idx['vIII']), 'wt': len(read_idx['wt'])}
