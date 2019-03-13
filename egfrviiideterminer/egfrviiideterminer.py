@@ -158,7 +158,7 @@ def extract_viii_reads(bam, exons):
     exon1_to_exon2_7 = readnames['1'].intersection(set_2_7)
     exon1_to_exon8_10 = readnames['1'].intersection(set_8_10)
 
-    return {'vIII': len(exon1_to_exon8_10), 'wt': len(exon1_to_exon2_7)}
+    return {'vIII': exon1_to_exon8_10, 'wt': exon1_to_exon2_7}
 
 
 def extract_viii_reads_based_on_sjs(bam, exons):
@@ -190,4 +190,4 @@ def extract_viii_reads_based_on_sjs(bam, exons):
     for _ in total_intersection:
         print( "Warning, read found aligned to exon1, one of the exons 2-7 AND one of the exons 8-10: " + _, file=sys.stderr)
     
-    return {'vIII': len(read_idx['vIII']), 'wt': len(read_idx['wt'])}
+    return {'vIII': read_idx['vIII'], 'wt': read_idx['wt']}

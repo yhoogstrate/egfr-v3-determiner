@@ -69,7 +69,23 @@ class Tests(unittest.TestCase):
         from egfrviiideterminer import egfrviiideterminer
         dbkey = 'hg38'
         
-        self.assertEqual(egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey]), {'vIII': 1, 'wt': 0})
+        self.assertEqual(egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey]), {'vIII': {'example_01'}, 'wt': set()})
+        self.assertEqual(egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey]), {'vIII': {'example_01'}, 'wt': set()})
+
+    def test_002(self):
+        input_file_sam = TEST_DIR + "test_002_wt_non-spliced.sam"
+        input_file_bam = TMP_DIR + "test_002_wt_non-spliced.bam"
+        
+        sam_to_sorted_bam(input_file_sam, input_file_bam)
+        
+        from egfrviiideterminer import egfrviiideterminer
+        dbkey = 'hg38'
+        
+        # hier moet die hem wel vinden, in wt
+        self.assertEqual(egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey]), {'vIII': set(), 'wt': {'example_002'}})
+        
+        # spliced only - hier moet die hem niet vinden, in wt
+        self.assertEqual(egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey]), {'vIII': set(), 'wt': {'example_002'}})
 
 
 if __name__ == '__main__':
