@@ -87,6 +87,25 @@ class Tests(unittest.TestCase):
         # spliced only - hier moet die hem niet vinden, in wt
         self.assertEqual(egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey]), {'vIII': set(), 'wt': {'example_002'}})
 
+    def test_003(self):
+        input_file_sam = TEST_DIR + "test_003_vIII_non_spliced.sam"
+        input_file_bam = TMP_DIR + "test_003_vIII_non_spliced.bam"
+        
+        sam_to_sorted_bam(input_file_sam, input_file_bam)
+        
+        from egfrviiideterminer import egfrviiideterminer
+        dbkey = 'hg19'
+        
+        # hier moet die hem wel vinden, in wt
+        results = egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey])
+        self.assertEqual(len(results['vIII']), 170)
+        self.assertEqual(len(results['wt']), 0)
+        
+        # spliced only - hier moet die hem niet vinden, in 
+        results = egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey])
+        self.assertEqual(len(results['vIII']), 0)
+        self.assertEqual(len(results['wt']), 0)
+
 
 if __name__ == '__main__':
     main()
