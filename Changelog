@@ -1,3 +1,6 @@
+2019-04-17  Youri Hoogstrate (v0.5.0)
+    * Fixes a rare issue where reads containing multiple splice junctions, are still properly analysed.
+
 2019-03-07  Youri Hoogstrate (v0.4.0)
     * Adds `-s / --spliced-reads-only` argument to detect only exon1-2 and exon1-8 spliced reads.
 
