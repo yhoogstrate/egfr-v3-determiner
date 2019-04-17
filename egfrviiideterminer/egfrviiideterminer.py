@@ -97,7 +97,7 @@ egfr_exons = {
 
 
 
-def get_splice_junction_position(alignedsegment):
+def get_splice_junction_positions(alignedsegment):
     """
     https://sourceforge.net/p/samtools/mailman/message/29373646/
 
@@ -112,7 +112,8 @@ def get_splice_junction_position(alignedsegment):
     X	BAM_CDIFF	8
     B	BAM_CBACK	9
     """
-    out = [None, None]# start, end
+    out = []
+    #out = [None, None]# start, end
     offset = alignedsegment.reference_start
     for cigar in alignedsegment.cigartuples:
         s = [offset,cigar]
@@ -126,10 +127,12 @@ def get_splice_junction_position(alignedsegment):
         elif cigar[0] == 9:
             offset -= cigar[1]
         elif cigar[0] == 3: # splice junction starts
-            out[0] = offset
-            out[1] = offset + cigar[1] + 1
+            #out[0] = offset
+            #out[1] = offset + cigar[1] + 1
 
-            return out
+            out.append([offset, offset + cigar[1] + 1])
+            
+            offset += cigar[1]
     
     return out
 
@@ -177,10 +180,14 @@ def extract_viii_reads_based_on_sjs(bam, exons):
     exon = "1"
     for read in fh.fetch(exons[exon][0], exons[exon][1], exons[exon][2]):
         if read.get_overlap(exons[exon][1], exons[exon][2]):
-            sj = get_splice_junction_position(read)
-            if sj[0] != None:
-                if sj[0] == exons['1'][2] and sj[1] in read_idx:
-                    read_idx[sj[1]].add(read.query_name)
+            add = False
+            for sj in get_splice_junction_positions(read):
+                if sj[0] != None:
+                    if sj[0] == exons['1'][2] and sj[1] in read_idx:
+                        add = True
+            
+            if add:
+                read_idx[sj[1]].add(read.query_name)
 
     #print(read_idx['vIII'])
     #print(read_idx['wt'])
