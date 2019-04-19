@@ -180,14 +180,11 @@ def extract_viii_reads_based_on_sjs(bam, exons):
     exon = "1"
     for read in fh.fetch(exons[exon][0], exons[exon][1], exons[exon][2]):
         if read.get_overlap(exons[exon][1], exons[exon][2]):
-            add = False
             for sj in get_splice_junction_positions(read):
                 if sj[0] != None:
                     if sj[0] == exons['1'][2] and sj[1] in read_idx:
-                        add = True
-            
-            if add:
-                read_idx[sj[1]].add(read.query_name)
+                        read_idx[sj[1]].add(read.query_name)
+                        break
 
     #print(read_idx['vIII'])
     #print(read_idx['wt'])
