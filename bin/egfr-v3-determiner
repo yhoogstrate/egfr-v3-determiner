@@ -51,17 +51,19 @@ def main():
 @click.option("--reference-build", "-r", required=True, type=click.Choice(['hg19', 'hg38']), help="Used reference genome (needed for EGFR exon coordinates)")
 @click.option('--spliced-reads-only', "-s", is_flag=True, help="If paired end reads with an insert size longer than 801 bases can be expected, wild-type exon-1 to exon-8 covering reads can can be expected. Enabling this flag only uses spliced reads for vIII determination.")
 @click.option('--read-names', "-n", is_flag=True, help="Report all read-names instead of the read counts.")
+@click.option('--dataset-suffix', "-d", type=(str), default="", help="Adds this suffix to the column names; tabs and newlines not allowed.")
 @click.argument('input_bam', type=click.Path(exists=True),nargs=-1)
-def CLI(reference_build, spliced_reads_only, read_names, input_bam):
+def CLI(reference_build, spliced_reads_only, read_names, input_bam, dataset_suffix):
+    dataset_suffix = dataset_suffix.replace("\t","").replace("\n","")
     from egfrviiideterminer import egfrviiideterminer
 
     if reference_build not in egfrviiideterminer.egfr_exons:
         raise Exception("unknown reference build")
 
     if read_names:
-        print("sample\tread-name\twt/vIII-status")
+        print("sample\tread-name\twt/vIII-status"+dataset_suffix)
     else:
-        print("sample\twt-reads\tvIII-reads")
+        print("sample\twt-reads"+dataset_suffix+"\tvIII-reads"+dataset_suffix)
     
     for _ in input_bam:
         if not spliced_reads_only:
