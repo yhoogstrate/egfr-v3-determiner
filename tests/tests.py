@@ -36,7 +36,6 @@ import pysam
 
 def sam_to_sorted_bam(sam, sorted_bam):
     if os.path.exists(sorted_bam):
-        print("path exists")
         return False
     else:
         # for save_stdout the file needs to be touched first
@@ -69,8 +68,8 @@ class Tests(unittest.TestCase):
         from egfrviiideterminer import egfrviiideterminer
         dbkey = 'hg38'
         
-        self.assertEqual(egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey]), {'vIII': {'example_01'}, 'wt': set()})
-        self.assertEqual(egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey]), {'vIII': {'example_01'}, 'wt': set()})
+        self.assertEqual(egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False), {'vIII': {'example_01'}, 'wt': set()})
+        self.assertEqual(egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False), {'vIII': {'example_01'}, 'wt': set()})
 
     def test_002(self):
         input_file_sam = TEST_DIR + "test_002_wt_non-spliced.sam"
@@ -82,10 +81,10 @@ class Tests(unittest.TestCase):
         dbkey = 'hg38'
         
         # hier moet die hem wel vinden, in wt
-        self.assertEqual(egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey]), {'vIII': set(), 'wt': {'example_002'}})
+        self.assertEqual(egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False), {'vIII': set(), 'wt': {'example_002'}})
         
         # spliced only - hier moet die hem niet vinden, in wt
-        self.assertEqual(egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey]), {'vIII': set(), 'wt': {'example_002'}})
+        self.assertEqual(egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False), {'vIII': set(), 'wt': {'example_002'}})
 
     def test_003(self):
         input_file_sam = TEST_DIR + "test_003_vIII_non_spliced.sam"
@@ -97,13 +96,32 @@ class Tests(unittest.TestCase):
         dbkey = 'hg19'
         
         # hier moet die hem wel vinden, in wt
-        results = egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey])
+        results = egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False)
         self.assertEqual(len(results['vIII']), 170)
         self.assertEqual(len(results['wt']), 0)
         
         # spliced only - hier moet die hem niet vinden, in 
-        results = egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey])
+        results = egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False)
         self.assertEqual(len(results['vIII']), 0)
+        self.assertEqual(len(results['wt']), 0)
+
+    def test_004(self):
+        input_file_sam = TEST_DIR + "test_004_interchromosomal.sam"
+        input_file_bam = TMP_DIR + "test_004_interchromosomal.bam"
+        
+        sam_to_sorted_bam(input_file_sam, input_file_bam)
+        
+        from egfrviiideterminer import egfrviiideterminer
+        dbkey = 'hg19'
+        
+        # spliced only - hier moet die hem niet vinden, in 
+        results = egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False)
+        self.assertEqual(len(results['vIII']), 0)
+        self.assertEqual(len(results['wt']), 0)
+
+        # spliced only - hier moet die hem niet vinden, in 
+        results = egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], True)
+        self.assertEqual(len(results['vIII']), 1)
         self.assertEqual(len(results['wt']), 0)
 
 

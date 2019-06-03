@@ -1,3 +1,6 @@
+2019-06-03  Youri Hoogstrate (v0.6.0)
+    * By default, exclude interchromosomal aligned mate pairs
+
 2019-04-19  Youri Hoogstrate (v0.5.2)
     * Adds argument to add suffix to column names
 
