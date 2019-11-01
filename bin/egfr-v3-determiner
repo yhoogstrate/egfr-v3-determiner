@@ -31,6 +31,7 @@
 
 import egfrviiideterminer
 import click
+from tqdm import tqdm
 
 
 def sam_to_sorted_bam(sam, sorted_bam):
@@ -66,7 +67,7 @@ def CLI(reference_build, spliced_reads_only, read_names, input_bam, include_inte
     else:
         print("sample\twt-reads"+dataset_suffix+"\tvIII-reads"+dataset_suffix)
     
-    for _ in input_bam:
+    for _ in tqdm(input_bam):
         if not spliced_reads_only:
             stats = egfrviiideterminer.extract_viii_reads(_, egfrviiideterminer.egfr_exons[reference_build], include_interchromosomal)
         else:

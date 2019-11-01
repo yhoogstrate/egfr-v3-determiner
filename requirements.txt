@@ -1,3 +1,4 @@
 Click
 nose
 pysam
+tqdm
