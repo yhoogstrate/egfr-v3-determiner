@@ -70,9 +70,9 @@ def CLI(reference_build, spliced_reads_only, read_names, input_bam, include_inte
     
     for _ in tqdm(input_bam):
         if not spliced_reads_only:
-            stats = egfrviiideterminer.extract_viii_reads(_, egfrviiideterminer.egfr_exons[reference_build], include_interchromosomal)
+            stats = egfrviiideterminer.extract_viii_reads(_, egfrviiideterminer.egfr_exons[reference_build], include_interchromosomal, include_duplicates)
         else:
-            stats = egfrviiideterminer.extract_viii_reads_based_on_sjs(_, egfrviiideterminer.egfr_exons[reference_build], include_interchromosomal)
+            stats = egfrviiideterminer.extract_viii_reads_based_on_sjs(_, egfrviiideterminer.egfr_exons[reference_build], include_interchromosomal, include_duplicates)
         
         if read_names:
             for readname in sorted(stats['wt']):

@@ -1,3 +1,6 @@
+2019-11-07  Youri Hoogstrate (v0.7.1)
+    * Fix implementation
+
 2019-11-06  Youri Hoogstrate (v0.7.0)
     * By default, exclude reads marked as PCR / optical duplicate by SAM flag
 
