@@ -68,8 +68,8 @@ class Tests(unittest.TestCase):
         from egfrviiideterminer import egfrviiideterminer
         dbkey = 'hg38'
         
-        self.assertEqual(egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False), {'vIII': {'example_01'}, 'wt': set()})
-        self.assertEqual(egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False), {'vIII': {'example_01'}, 'wt': set()})
+        self.assertEqual(egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, False), {'vIII': {'example_01'}, 'wt': set()})
+        self.assertEqual(egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, False), {'vIII': {'example_01'}, 'wt': set()})
 
     def test_002(self):
         input_file_sam = TEST_DIR + "test_002_wt_non-spliced.sam"
@@ -81,10 +81,10 @@ class Tests(unittest.TestCase):
         dbkey = 'hg38'
         
         # hier moet die hem wel vinden, in wt
-        self.assertEqual(egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False), {'vIII': set(), 'wt': {'example_002'}})
+        self.assertEqual(egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, False), {'vIII': set(), 'wt': {'example_002'}})
         
         # spliced only - hier moet die hem niet vinden, in wt
-        self.assertEqual(egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False), {'vIII': set(), 'wt': {'example_002'}})
+        self.assertEqual(egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, False), {'vIII': set(), 'wt': {'example_002'}})
 
     def test_003(self):
         input_file_sam = TEST_DIR + "test_003_vIII_non_spliced.sam"
@@ -96,12 +96,17 @@ class Tests(unittest.TestCase):
         dbkey = 'hg19'
         
         # hier moet die hem wel vinden, in wt
-        results = egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False)
+        results = egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, True)
         self.assertEqual(len(results['vIII']), 170)
         self.assertEqual(len(results['wt']), 0)
         
+        # do not allow PCR/optical duplicates
+        results = egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, False)
+        self.assertEqual(len(results['vIII']), 43)
+        self.assertEqual(len(results['wt']), 0)
+        
         # spliced only - hier moet die hem niet vinden, in 
-        results = egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False)
+        results = egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, True)
         self.assertEqual(len(results['vIII']), 0)
         self.assertEqual(len(results['wt']), 0)
 
@@ -115,14 +120,33 @@ class Tests(unittest.TestCase):
         dbkey = 'hg19'
         
         # spliced only - hier moet die hem niet vinden, in 
-        results = egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False)
+        results = egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, False)
         self.assertEqual(len(results['vIII']), 0)
         self.assertEqual(len(results['wt']), 0)
 
-        # spliced only - hier moet die hem niet vinden, in 
-        results = egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], True)
+        # ook niet spliced, hier moet je hem wel in vinden
+        results = egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], True, False)
         self.assertEqual(len(results['vIII']), 1)
         self.assertEqual(len(results['wt']), 0)
+
+    def test_005(self):
+        input_file_sam = TEST_DIR + "test_005_duplicate.sam"
+        input_file_bam = TMP_DIR + "test_005_duplicate.bam"
+        
+        sam_to_sorted_bam(input_file_sam, input_file_bam)
+        
+        from egfrviiideterminer import egfrviiideterminer
+        dbkey = 'hg19'
+        
+        # geen duplicates = niet vinden
+        results = egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, False)
+        self.assertEqual(len(results['vIII']), 0)
+        self.assertEqual(len(results['wt']), 1)
+
+        # wel duplicates = wel vinden
+        results = egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, True)
+        self.assertEqual(len(results['vIII']), 0)
+        self.assertEqual(len(results['wt']), 2)
 
 
 if __name__ == '__main__':

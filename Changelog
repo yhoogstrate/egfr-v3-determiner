@@ -1,3 +1,6 @@
+2019-11-06  Youri Hoogstrate (v0.7.0)
+    * By default, exclude reads marked as PCR / optical duplicate by SAM flag
+
 2019-06-03  Youri Hoogstrate (v0.6.0)
     * By default, exclude interchromosomal aligned mate pairs
 

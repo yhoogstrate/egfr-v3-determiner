@@ -138,7 +138,7 @@ def get_splice_junction_positions(alignedsegment):
 
 
 
-def extract_viii_reads(bam, exons, include_interchromosomal):
+def extract_viii_reads(bam, exons, include_interchromosomal, include_duplicates):
     set_2_7 = set([])
     set_8_10 = set([])
     readnames = {'1': set(),
@@ -151,7 +151,8 @@ def extract_viii_reads(bam, exons, include_interchromosomal):
         for read in fh.fetch(exons[exon][0], exons[exon][1], exons[exon][2]):
             if read.get_overlap(exons[exon][1], exons[exon][2]):
                 if include_interchromosomal or (not read.is_paired or (read.is_paired and read.next_reference_name == "chr7")):
-                    readnames[exon].add(read.query_name)
+                    if include_duplicates or (not read.is_duplicate):
+                        readnames[exon].add(read.query_name)
 
     total_intersection = readnames['1'].intersection(set_2_7, set_8_10)
     #if len(total_intersection) > 0:
@@ -165,7 +166,7 @@ def extract_viii_reads(bam, exons, include_interchromosomal):
     return {'vIII': exon1_to_exon8_10, 'wt': exon1_to_exon2_7}
 
 
-def extract_viii_reads_based_on_sjs(bam, exons, include_interchromosomal):
+def extract_viii_reads_based_on_sjs(bam, exons, include_interchromosomal, include_duplicates):
     set_2 = set()# readnames of those that splice from exon 1 to 2
     set_8 = set()# readnames of those that splice from exon 1 to 8
     
@@ -182,11 +183,12 @@ def extract_viii_reads_based_on_sjs(bam, exons, include_interchromosomal):
     for read in fh.fetch(exons[exon][0], exons[exon][1], exons[exon][2]):
         if read.get_overlap(exons[exon][1], exons[exon][2]):
             if include_interchromosomal or (not read.is_paired or (read.is_paired and read.next_reference_name == "chr7")):
-                for sj in get_splice_junction_positions(read):
-                    if sj[0] != None:
-                        if sj[0] == exons['1'][2] and sj[1] in read_idx:
-                            read_idx[sj[1]].add(read.query_name)
-                            break
+                if include_duplicates or (not read.is_duplicate):
+                    for sj in get_splice_junction_positions(read):
+                        if sj[0] != None:
+                            if sj[0] == exons['1'][2] and sj[1] in read_idx:
+                                read_idx[sj[1]].add(read.query_name)
+                                break
 
     #print(read_idx['vIII'])
     #print(read_idx['wt'])

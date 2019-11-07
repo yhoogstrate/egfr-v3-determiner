@@ -31,6 +31,7 @@
 
 import egfrviiideterminer
 import click
+from tqdm import tqdm
 
 
 def sam_to_sorted_bam(sam, sorted_bam):
@@ -53,8 +54,9 @@ def main():
 @click.option('--read-names', "-n", is_flag=True, help="Report all read-names instead of the read counts.")
 @click.option('--include-interchromosomal', "-i", is_flag=True, help="Include paired-end reads that have an interchromosomal mapped mate (disabled by default).")
 @click.option('--dataset-suffix', "-d", type=(str), default="", help="Adds this suffix to the column names; tabs and newlines not allowed.")
+@click.option('--include-duplicates', "-f", is_flag=True, help="Force including duplicate reads (as marked by samtools/sambamba/picard etc. - disabled by default).")
 @click.argument('input_bam', type=click.Path(exists=True),nargs=-1)
-def CLI(reference_build, spliced_reads_only, read_names, input_bam, include_interchromosomal, dataset_suffix):
+def CLI(reference_build, spliced_reads_only, read_names, input_bam, include_interchromosomal, dataset_suffix, include_duplicates):
     dataset_suffix = dataset_suffix.replace("\t","").replace("\n","")
     from egfrviiideterminer import egfrviiideterminer
 
@@ -66,7 +68,7 @@ def CLI(reference_build, spliced_reads_only, read_names, input_bam, include_inte
     else:
         print("sample\twt-reads"+dataset_suffix+"\tvIII-reads"+dataset_suffix)
     
-    for _ in input_bam:
+    for _ in tqdm(input_bam):
         if not spliced_reads_only:
             stats = egfrviiideterminer.extract_viii_reads(_, egfrviiideterminer.egfr_exons[reference_build], include_interchromosomal)
         else:
