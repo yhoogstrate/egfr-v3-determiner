@@ -96,21 +96,28 @@ egfr_exons = {
 }
 
 
+def check_or_update_chr(chrlist, pysam_handle):
+    for _ in chrlist:
+        _chr = chrlist[_][0]
+        if _chr not in pysam_handle.references:
+            chrlist[_][0] = chrlist[_][0].replace('chr','')
+
+    return chrlist
 
 def get_splice_junction_positions(alignedsegment):
     """
     https://sourceforge.net/p/samtools/mailman/message/29373646/
 
-    M	BAM_CMATCH	0
-    I	BAM_CINS	1
-    D	BAM_CDEL	2
-    N	BAM_CREF_SKIP	3
-    S	BAM_CSOFT_CLIP	4
-    H	BAM_CHARD_CLIP	5
-    P	BAM_CPAD	6
-    =	BAM_CEQUAL	7
-    X	BAM_CDIFF	8
-    B	BAM_CBACK	9
+    M    BAM_CMATCH    0
+    I    BAM_CINS    1
+    D    BAM_CDEL    2
+    N    BAM_CREF_SKIP    3
+    S    BAM_CSOFT_CLIP    4
+    H    BAM_CHARD_CLIP    5
+    P    BAM_CPAD    6
+    =    BAM_CEQUAL    7
+    X    BAM_CDIFF    8
+    B    BAM_CBACK    9
     """
     out = []
     #out = [None, None]# start, end
@@ -146,11 +153,13 @@ def extract_viii_reads(bam, exons, include_interchromosomal, include_duplicates)
                  '8': set_8_10, '9': set_8_10, '10': set_8_10}
 
     fh = pysam.AlignmentFile(bam, "rb")
+    exons = check_or_update_chr(exons, fh)
+    print(list(set([_[0] for _ in exons.values()])))
 
     for exon in exons:
         for read in fh.fetch(exons[exon][0], exons[exon][1], exons[exon][2]):
             if read.get_overlap(exons[exon][1], exons[exon][2]):
-                if include_interchromosomal or (not read.is_paired or (read.is_paired and read.next_reference_name == "chr7")):
+                if include_interchromosomal or (not read.is_paired or (read.is_paired and read.next_reference_name in list(set([_[0] for _ in exons.values()])))):
                     if include_duplicates or (not read.is_duplicate):
                         readnames[exon].add(read.query_name)
 
@@ -178,11 +187,13 @@ def extract_viii_reads_based_on_sjs(bam, exons, include_interchromosomal, includ
                 read_idx[exons[exon][1]] = set_8
 
     fh = pysam.AlignmentFile(bam, "rb")
+    exons = check_or_update_chr(exons, fh)
+
 
     exon = "1"
     for read in fh.fetch(exons[exon][0], exons[exon][1], exons[exon][2]):
         if read.get_overlap(exons[exon][1], exons[exon][2]):
-            if include_interchromosomal or (not read.is_paired or (read.is_paired and read.next_reference_name == "chr7")):
+            if include_interchromosomal or (not read.is_paired or (read.is_paired and read.next_reference_name in list(set([_[0] for _ in exons.values()])))):
                 if include_duplicates or (not read.is_duplicate):
                     for sj in get_splice_junction_positions(read):
                         if sj[0] != None:

@@ -148,6 +148,18 @@ class Tests(unittest.TestCase):
         self.assertEqual(len(results['vIII']), 0)
         self.assertEqual(len(results['wt']), 2)
 
+    def test_006(self):
+        input_file_sam = TEST_DIR + "test_006.sam"
+        input_file_bam = TMP_DIR + "test_006.bam"
+        
+        sam_to_sorted_bam(input_file_sam, input_file_bam)
+        
+        from egfrviiideterminer import egfrviiideterminer
+        dbkey = 'hg38'
+        
+        self.assertEqual(egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, False), {'vIII': {'example_01'}, 'wt': set()})
+        self.assertEqual(egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, False), {'vIII': {'example_01'}, 'wt': set()})
+
 
 if __name__ == '__main__':
     main()
