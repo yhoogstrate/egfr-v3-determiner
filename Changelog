@@ -1,3 +1,6 @@
+2020-02-28  Youri Hoogstrate (v0.7.2)
+    * Allows to use both 'chr7' and '7' alignments
+
 2019-11-07  Youri Hoogstrate (v0.7.1)
     * Fix implementation
 
