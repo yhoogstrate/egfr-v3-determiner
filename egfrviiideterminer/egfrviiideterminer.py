@@ -154,7 +154,6 @@ def extract_viii_reads(bam, exons, include_interchromosomal, include_duplicates)
 
     fh = pysam.AlignmentFile(bam, "rb")
     exons = check_or_update_chr(exons, fh)
-    print(list(set([_[0] for _ in exons.values()])))
 
     for exon in exons:
         for read in fh.fetch(exons[exon][0], exons[exon][1], exons[exon][2]):
