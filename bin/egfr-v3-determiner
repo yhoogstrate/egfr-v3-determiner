@@ -30,6 +30,7 @@
 
 
 import egfrviiideterminer
+
 import click
 from tqdm import tqdm
 
@@ -55,10 +56,33 @@ def main():
 @click.option('--include-interchromosomal', "-i", is_flag=True, help="Include paired-end reads that have an interchromosomal mapped mate (disabled by default).")
 @click.option('--dataset-suffix', "-d", type=(str), default="", help="Adds this suffix to the column names; tabs and newlines not allowed.")
 @click.option('--include-duplicates', "-f", is_flag=True, help="Force including duplicate reads (as marked by samtools/sambamba/picard etc. - disabled by default).")
+@click.option('--exons-wt', "-w", help="Exons included for counting (--spliced-reads-only disabled). Options: '2' '2,3' (equals 'default'), '2,3,4', '2,3,4,5', '2,3,4,5,6', '2,3,4,5,6,7' (equals 'all'), default: '2,3'.",default='default')
+@click.option('--exons-viii', "-v", help="Exons included for counting (--spliced-reads-only disabled). Options: '8' '8,9' (equals 'default'), '8,9,10' (equals 'all'), default: '8,9'.",default='default')
 @click.argument('input_bam', type=click.Path(exists=True),nargs=-1)
-def CLI(reference_build, spliced_reads_only, read_names, input_bam, include_interchromosomal, dataset_suffix, include_duplicates):
-    dataset_suffix = dataset_suffix.replace("\t","").replace("\n","")
+def CLI(reference_build, spliced_reads_only, read_names, input_bam, include_interchromosomal, dataset_suffix, include_duplicates, exons_wt, exons_viii):
     from egfrviiideterminer import egfrviiideterminer
+    from egfrviiideterminer import EXONS_WT_DEFAULT, EXONS_VIII_DEFAULT, EXONS_WT_ALL, EXONS_VIII_ALL
+
+    dataset_suffix = dataset_suffix.replace("\t","").replace("\n","")
+
+    if not spliced_reads_only:
+
+        if exons_wt == 'default':
+            exons_wt = EXONS_WT_DEFAULT # = ['2','3']
+        elif exons_wt == 'all':
+            exons_wt = EXONS_WT_ALL # = ['2','3','4','5','6','7']
+        else:
+            exons_wt = [str(int(_)) for _ in ','.split(exons_wt)]
+
+        if exons_viii == 'default':
+            exons_viii = EXONS_VIII_DEFAULT # = ['8','9']
+        elif exons_viii == 'all':
+            exons_viii = EXONS_VIII_ALL # = ['8','9','10']
+        else:
+            exons_viii = [str(int(_)) for _ in ','.split(exons_viii)]
+
+        #print(exons_wt)
+        #print(exons_viii)
 
     if reference_build not in egfrviiideterminer.egfr_exons:
         raise Exception("unknown reference build")
@@ -70,7 +94,7 @@ def CLI(reference_build, spliced_reads_only, read_names, input_bam, include_inte
     
     for _ in tqdm(input_bam):
         if not spliced_reads_only:
-            stats = egfrviiideterminer.extract_viii_reads(_, egfrviiideterminer.egfr_exons[reference_build], include_interchromosomal, include_duplicates)
+            stats = egfrviiideterminer.extract_viii_reads(_, egfrviiideterminer.egfr_exons[reference_build], include_interchromosomal, include_duplicates, exons_wt, exons_viii)
         else:
             stats = egfrviiideterminer.extract_viii_reads_based_on_sjs(_, egfrviiideterminer.egfr_exons[reference_build], include_interchromosomal, include_duplicates)
         

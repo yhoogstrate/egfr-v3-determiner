@@ -33,6 +33,8 @@ import unittest
 import os
 import pysam
 
+from egfrviiideterminer import EXONS_WT_ALL, EXONS_VIII_ALL
+
 
 def sam_to_sorted_bam(sam, sorted_bam):
     if os.path.exists(sorted_bam):
@@ -68,7 +70,7 @@ class Tests(unittest.TestCase):
         from egfrviiideterminer import egfrviiideterminer
         dbkey = 'hg38'
         
-        self.assertEqual(egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, False), {'vIII': {'example_01'}, 'wt': set()})
+        self.assertEqual(egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, False, EXONS_WT_ALL, EXONS_VIII_ALL), {'vIII': {'example_01'}, 'wt': set()})
         self.assertEqual(egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, False), {'vIII': {'example_01'}, 'wt': set()})
 
     def test_002(self):
@@ -81,7 +83,7 @@ class Tests(unittest.TestCase):
         dbkey = 'hg38'
         
         # hier moet die hem wel vinden, in wt
-        self.assertEqual(egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, False), {'vIII': set(), 'wt': {'example_002'}})
+        self.assertEqual(egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, False, EXONS_WT_ALL, EXONS_VIII_ALL), {'vIII': set(), 'wt': {'example_002'}})
         
         # spliced only - hier moet die hem niet vinden, in wt
         self.assertEqual(egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, False), {'vIII': set(), 'wt': {'example_002'}})
@@ -96,12 +98,12 @@ class Tests(unittest.TestCase):
         dbkey = 'hg19'
         
         # hier moet die hem wel vinden, in wt
-        results = egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, True)
+        results = egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, True, EXONS_WT_ALL, EXONS_VIII_ALL)
         self.assertEqual(len(results['vIII']), 170)
         self.assertEqual(len(results['wt']), 0)
         
         # do not allow PCR/optical duplicates
-        results = egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, False)
+        results = egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, False, EXONS_WT_ALL, EXONS_VIII_ALL)
         self.assertEqual(len(results['vIII']), 43)
         self.assertEqual(len(results['wt']), 0)
         
@@ -157,7 +159,7 @@ class Tests(unittest.TestCase):
         from egfrviiideterminer import egfrviiideterminer
         dbkey = 'hg38'
         
-        self.assertEqual(egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, False), {'vIII': {'example_01'}, 'wt': set()})
+        self.assertEqual(egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, False, EXONS_WT_ALL, EXONS_VIII_ALL), {'vIII': {'example_01'}, 'wt': set()})
         self.assertEqual(egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, False), {'vIII': {'example_01'}, 'wt': set()})
 
 

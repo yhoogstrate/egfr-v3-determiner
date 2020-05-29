@@ -144,13 +144,22 @@ def get_splice_junction_positions(alignedsegment):
     return out
 
 
-
-def extract_viii_reads(bam, exons, include_interchromosomal, include_duplicates):
+#wt=['2','3','4','5','6','7']
+#viii=['8','9','10']
+def extract_viii_reads(bam, exons, include_interchromosomal, include_duplicates, wt, viii):
     set_2_7 = set([])
     set_8_10 = set([])
-    readnames = {'1': set(),
-                 '2': set_2_7, '3': set_2_7, '4': set_2_7, '5': set_2_7, '6': set_2_7, '7': set_2_7,
-                 '8': set_8_10, '9': set_8_10, '10': set_8_10}
+    decoy = set([])
+
+    readnames = {'1': set()}
+    for _ in range(2, 10 + 1):
+        _ = str(_)
+        if _ in wt:
+            readnames[str(_)] = set_2_7
+        elif _ in viii:
+            readnames[str(_)] = set_8_10
+        else:
+            readnames[str(_)] = decoy
 
     fh = pysam.AlignmentFile(bam, "rb")
     exons = check_or_update_chr(exons, fh)
