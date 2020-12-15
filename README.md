@@ -40,7 +40,7 @@ Options:
                                   coordinates)  [required]
   -s, --spliced-reads-only        If paired end reads with an insert size
                                   longer than 801 bases can be expected, wild-
-                                  type exon-1 to exon-8 covering reads can can
+                                  type exon-1 to exon-8 covering reads can
                                   be expected. Enabling this flag only uses
                                   spliced reads for vIII determination.
   -n, --read-names                Report all read-names instead of the read
