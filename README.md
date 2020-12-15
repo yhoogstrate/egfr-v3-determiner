@@ -2,7 +2,7 @@
 
 ## What is does ##
 
-Estimates the number of EGFR-vIII and EGFR-wt reads in a BAM file:
+Estimates the number of EGFR-vIII and EGFR-wt reads from a BAM file directly:
 
 ```
 $ egfr-v3-determiner -r hg38 tmp/test_001.bam
