@@ -62,7 +62,7 @@ Options:
                                   coordinates)  [required]
   -s, --spliced-reads-only        If paired end reads with an insert size
                                   longer than 801 bases can be expected, wild-
-                                  type exon-1 to exon-8 covering reads can
+                                  type exon-1 to exon-8 covering reads can can
                                   be expected. Enabling this flag only uses
                                   spliced reads for vIII determination.
   -n, --read-names                Report all read-names instead of the read
@@ -72,6 +72,18 @@ Options:
                                   default).
   -d, --dataset-suffix TEXT       Adds this suffix to the column names; tabs
                                   and newlines not allowed.
+  -f, --include-duplicates        Force including duplicate reads (as marked
+                                  by samtools/sambamba/picard etc. - disabled
+                                  by default).
+  -w, --exons-wt TEXT             Exons included for counting (--spliced-
+                                  reads-only disabled). Options: '2' '2,3'
+                                  (equals 'default'), '2,3,4', '2,3,4,5',
+                                  '2,3,4,5,6', '2,3,4,5,6,7' (equals 'all'),
+                                  default: '2,3'.
+  -v, --exons-viii TEXT           Exons included for counting (--spliced-
+                                  reads-only disabled). Options: '8' '8,9'
+                                  (equals 'default'), '8,9,10' (equals 'all'),
+                                  default: '8,9'.
   --help                          Show this message and exit.
 ```
 
@@ -110,6 +122,41 @@ to send them to me.
 If you prefer private communication you can e-mail me at:
 
 y {dot} hoogstrate {at} erasmusmc {.} nl
+
+
+## Duplicate reads ##
+
+Reads marked as duplicate (using sambamba / Picard / samtools etc.) are by
+default not included for counting. This is because they typically account
+for more data points but not for more information. You can compare it with
+scaling a bitmap figure; it contains more pixels but not more information.
+
+If the data is single-end sequenced to an extreme depth, you may like to
+include PCR duplicates as they could be coincidentallly marked as duplicate
+while they originate from actual distinct RNA molecules. One may wonder why
+duplicate marking was performed in the first place.
+
+Nevertheless, to enable countingfor duplicate reads, use `-f` /
+`--include-duplicates`. 
+
+
+## Modify used exons ##
+
+The used EGFR exons can be changed using the following arguments:
+
+```
+  -w, --exons-wt TEXT             Exons included for counting (--spliced-
+                                  reads-only disabled). Options: '2' '2,3'
+                                  (equals 'default'), '2,3,4', '2,3,4,5',
+                                  '2,3,4,5,6', '2,3,4,5,6,7' (equals 'all'),
+                                  default: '2,3'.
+  -v, --exons-viii TEXT           Exons included for counting (--spliced-
+                                  reads-only disabled). Options: '8' '8,9'
+                                  (equals 'default'), '8,9,10' (equals 'all'),
+                                  default: '8,9'.
+```
+
+Ths only works when non-spliced alignments are permitted.
 
 
 ## LICENSE ##
