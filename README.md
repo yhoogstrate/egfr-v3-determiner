@@ -105,7 +105,7 @@ Great, please do so :) I am more than happy to help.
 If you find some odd reads that I need to take a look at, feel free
 to send them to me.
 
-If you prefer no public communication you can e-mail me at:
+If you prefer private communication you can e-mail me at:
 
 y {dot} hoogstrate {at} erasmusmc {.} nl
 
