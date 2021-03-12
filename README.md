@@ -96,7 +96,7 @@ instance '-EGFRvIII-reads'. This can be achieved by using the `-d` /
 `--dataset-suffix` argument:
 
 ```
-egfr-v3-determiner -d '-EGFRvIII-reads' rna-seq-sample.bam > EGFRvIII.counts.txt
+egfr-v3-determiner -d '-EGFRvIII-reads' rna-seq-sample-1.bam rna-seq-sample-2.bam > EGFRvIII.counts.txt
 ```
 
 ## I NEED HELP / I FOUND A BUG / I WANT A FEATURE ##
