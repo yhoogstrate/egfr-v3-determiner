@@ -6,8 +6,10 @@ loss of exons 2 - 7 at RNA level.
 
 Using RNA-seq, EGFRvIII can be determined based on reads that:
 
- (1) fall exactly over the splice junction (use `-s` / `--spliced-only`)
- (2) are 'spanning' the splice junction and are thus mapped perfectly within exons 1 and 8
+ - (1) fall exactly over the splice junction (use `-s` / `--spliced-only`)
+ - (2) are 'spanning' the splice junction and are thus mapped perfectly within exons 1 and 8
+
+**The only thing that you need are properly aligned RNA-seq BAM files and this tool.**
 
 Please notice that type 2 reads can also arise with other structural variants
 in combination with large insert sizes. For instance, if exons 2 - 6 are
