@@ -22,10 +22,10 @@ exon 7, it could be wrongly interpreted as EGFRvIII read.
 We designed a small python tool for estimnating the read counts and/or extracting
 the actual read names that allows to further analysed the sequencing data.
 
-Estimates the number of EGFR-vIII and EGFR-wt reads from a BAM file directly:
+Estimates the number of EGFR-vIII and EGFR-wt reads from BAM files directly:
 
 ```
-$ egfr-v3-determiner -r hg38 tmp/test_001.bam
+$ egfr-v3-determiner -r hg38 tmp/test_001.bam tmp/test_002_wt_non-spliced.bam
 ```
 
 Will result in a text file like this:
@@ -46,6 +46,8 @@ source .venv/bin/activate
 python setup.py install
 
 egfr-v3-determiner --help
+
+nosetests tests/*.py
 ```
 
 ## Usage ##
