@@ -16,7 +16,6 @@ in combination with large insert sizes. For instance, if exons 2 - 6 are
 deleted and the length of the inner sequence of the RNA frament is longer than
 exon 7, it could be wrongly interpreted as EGFRvIII read.
 
-
 ## What is does ##
 
 We designed a small python tool for estimnating the read counts and/or extracting
@@ -33,6 +32,13 @@ Will result in a text file like this:
 | sample | wt-reads | vIII-reads |
 |--------|----------|------------|
 | tmp/test_001.bam | 0 | 1 |
+
+## Citing ##
+
+When using this package for scientific purposes, cite the following manuscript:
+```
+Youri Hoogstrate, Santoesha A Ghisai, Maurice de Wit, Iris de Heer, Kaspar Draaisma, Job van Riet, Harmen J G van de Werken, Vincent Bours, Jan Buter, Isabelle Vanden Bempt, Marica Eoli, Enrico Franceschi, Jean-Sebastien Frenel, Thierry Gorlia, Monique C Hanse, Ann Hoeben, Melissa Kerkhof, Johan M Kros, Sieger Leenstra, Giuseppe Lombardi, Slávka Lukacova, Pierre A Robe, Juan M Sepulveda, Walter Taal, Martin Taphoorn, René M Vernhout, Annemiek M E Walenkamp, Colin Watts, Michael Weller, Filip Y F de Vos, Guido W Jenster, Martin van den Bent, Pim J French, The EGFRvIII transcriptome in glioblastoma, a meta-omics analysis, Neuro-Oncology, 2021; noab231, https://doi.org/10.1093/neuonc/noab231
+```
 
 ## Installation ##
 
