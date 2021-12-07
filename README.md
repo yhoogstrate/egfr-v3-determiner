@@ -16,9 +16,27 @@ in combination with large insert sizes. For instance, if exons 2 - 6 are
 deleted and the length of the inner sequence of the RNA frament is longer than
 exon 7, it could be wrongly interpreted as EGFRvIII read.
 
-## Citing egfr-v3-determiner ##
+## What is does ##
 
-When using this package for scientific purposes, cite the following manuscript:
+We designed a small python tool for estimnating the read counts and/or extracting
+the actual read names that allows to further analysed the sequencing data.
+
+Estimates the number of EGFR-vIII and EGFR-wt reads from BAM files directly:
+
+```
+$ egfr-v3-determiner -r hg38 tmp/test_001.bam tmp/test_002_wt_non-spliced.bam
+```
+
+Will result in a text file like this:
+
+| sample | wt-reads | vIII-reads |
+|--------|----------|------------|
+| tmp/test_001.bam | 0 | 1 |
+
+
+## egfr-v3-determiner Manuscript ##
+
+If you like to read more about the application of egfr-v3-determiner or when using this package for scientific purposes, please read/cite the following manuscript:
 
 [10.1093/neuonc/noab231](https://doi.org/10.1093/neuonc/noab231)
 
@@ -40,25 +58,8 @@ https://doi.org/10.1093/neuonc/noab231
 ```
 
 This will indirectly help me further maintaining this software package.
+
 Thank you in advance, Youri
-
-## What is does ##
-
-We designed a small python tool for estimnating the read counts and/or extracting
-the actual read names that allows to further analysed the sequencing data.
-
-Estimates the number of EGFR-vIII and EGFR-wt reads from BAM files directly:
-
-```
-$ egfr-v3-determiner -r hg38 tmp/test_001.bam tmp/test_002_wt_non-spliced.bam
-```
-
-Will result in a text file like this:
-
-| sample | wt-reads | vIII-reads |
-|--------|----------|------------|
-| tmp/test_001.bam | 0 | 1 |
-
 
 ## Installation ##
 
